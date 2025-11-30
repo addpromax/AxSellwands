@@ -66,12 +66,6 @@ hooks:
 [AxSellwands] Using multi-provider mode with 2 provider(s)!
 ```
 
-### 详细文档
-
-- 📖 [完整集成指南](CUSTOMFISHING_EXCELLENTSHOP_GUIDE.md)
-- 📝 [更新说明](更新说明.txt)
-- 🔧 [编译修复说明](编译修复说明.txt)
-
 ---
 
 ## 原版信息
