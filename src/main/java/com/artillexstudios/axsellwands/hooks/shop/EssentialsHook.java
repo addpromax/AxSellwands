@@ -5,7 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class EssentialsHook implements PricesHook {
+public class EssentialsHook implements AdvancedPricesHook {
     private IEssentials manager;
 
     @Override

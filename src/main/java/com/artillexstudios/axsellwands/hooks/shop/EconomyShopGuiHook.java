@@ -4,7 +4,7 @@ import me.gypopo.economyshopgui.api.EconomyShopGUIHook;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class EconomyShopGuiHook implements PricesHook {
+public class EconomyShopGuiHook implements AdvancedPricesHook {
 
     @Override
     public void setup() {

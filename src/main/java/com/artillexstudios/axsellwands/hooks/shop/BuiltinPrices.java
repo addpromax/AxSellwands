@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 
-public class BuiltinPrices implements PricesHook {
+public class BuiltinPrices implements AdvancedPricesHook {
     private Config PRICES;
 
     @Override

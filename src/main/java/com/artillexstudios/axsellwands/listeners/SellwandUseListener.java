@@ -8,6 +8,9 @@ import com.artillexstudios.axapi.utils.Title;
 import com.artillexstudios.axsellwands.api.events.AxSellwandsSellEvent;
 import com.artillexstudios.axsellwands.hooks.HookManager;
 import com.artillexstudios.axsellwands.hooks.container.ContainerHook;
+import com.artillexstudios.axsellwands.hooks.shop.AdvancedPricesHook;
+import com.artillexstudios.axsellwands.hooks.shop.PricesHook;
+import com.artillexstudios.axsellwands.hooks.shop.SellResult;
 import com.artillexstudios.axsellwands.sellwands.Sellwand;
 import com.artillexstudios.axsellwands.sellwands.Sellwands;
 import com.artillexstudios.axsellwands.utils.HistoryUtils;
@@ -93,12 +96,28 @@ public class SellwandUseListener implements Listener {
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Map<Material, Integer> items = new HashMap<>();
+            Map<ItemStack, Double> itemPrices = new HashMap<>();
+            PricesHook pricesHook = HookManager.getShopPrices();
+            boolean isAdvanced = pricesHook instanceof AdvancedPricesHook;
+            
+            // 第一遍：检查所有物品的价格和限制
             for (ItemStack it : contents) {
                 if (it == null) continue;
-                double price = HookManager.getShopPrices().getPrice(player, it);
-                if (price <= 0) continue;
+                
+                double price;
+                if (isAdvanced) {
+                    AdvancedPricesHook advancedHook = (AdvancedPricesHook) pricesHook;
+                    SellResult result = advancedHook.canSell(player, it);
+                    if (!result.canSell()) continue;
+                    price = result.getPrice();
+                } else {
+                    price = pricesHook.getPrice(player, it);
+                    if (price <= 0) continue;
+                }
+                
                 price *= multiplier;
-
+                itemPrices.put(it, price);
+                
                 newSoldPrice += price;
                 newSoldAmount += it.getAmount();
 
@@ -106,7 +125,18 @@ public class SellwandUseListener implements Listener {
                     items.put(it.getType(), items.get(it.getType()) + it.getAmount());
                 else
                     items.put(it.getType(), it.getAmount());
-
+            }
+            
+            // 第二遍：确认出售并清空物品
+            for (Map.Entry<ItemStack, Double> entry : itemPrices.entrySet()) {
+                ItemStack it = entry.getKey();
+                double price = entry.getValue();
+                
+                if (isAdvanced) {
+                    AdvancedPricesHook advancedHook = (AdvancedPricesHook) pricesHook;
+                    advancedHook.confirmSell(player, it, price);
+                }
+                
                 it.setAmount(0);
             }
 
@@ -196,10 +226,23 @@ public class SellwandUseListener implements Listener {
 
             if (block.getState() instanceof Container container) container.update();
         } else {
+            PricesHook pricesHook = HookManager.getShopPrices();
+            boolean isAdvanced = pricesHook instanceof AdvancedPricesHook;
+            
             for (ItemStack it : contents) {
                 if (it == null) continue;
-                double price = HookManager.getShopPrices().getPrice(player, it);
-                if (price == -1.0D) continue;
+                
+                double price;
+                if (isAdvanced) {
+                    AdvancedPricesHook advancedHook = (AdvancedPricesHook) pricesHook;
+                    SellResult result = advancedHook.canSell(player, it);
+                    if (!result.canSell()) continue;
+                    price = result.getPrice();
+                } else {
+                    price = pricesHook.getPrice(player, it);
+                    if (price == -1.0D) continue;
+                }
+                
                 price *= multiplier;
 
                 newSoldPrice += price;

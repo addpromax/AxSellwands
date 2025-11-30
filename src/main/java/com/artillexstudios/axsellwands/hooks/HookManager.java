@@ -14,7 +14,6 @@ import com.artillexstudios.axsellwands.hooks.protection.GriefPreventionHook;
 import com.artillexstudios.axsellwands.hooks.protection.HuskClaimsHook;
 import com.artillexstudios.axsellwands.hooks.protection.HuskTownsHook;
 import com.artillexstudios.axsellwands.hooks.protection.IridiumSkyBlockHook;
-import com.artillexstudios.axsellwands.hooks.protection.KingdomsXHook;
 import com.artillexstudios.axsellwands.hooks.protection.LandsHook;
 import com.artillexstudios.axsellwands.hooks.protection.PlotSquaredHook;
 import com.artillexstudios.axsellwands.hooks.protection.ProtectionHook;
@@ -26,10 +25,11 @@ import com.artillexstudios.axsellwands.hooks.protection.WorldGuardHook;
 import com.artillexstudios.axsellwands.hooks.shop.AxGensHook;
 import com.artillexstudios.axsellwands.hooks.shop.BuiltinPrices;
 import com.artillexstudios.axsellwands.hooks.shop.CMIPricesHook;
-import com.artillexstudios.axsellwands.hooks.shop.DynamicShop3Hook;
+import com.artillexstudios.axsellwands.hooks.shop.CustomFishingHook;
 import com.artillexstudios.axsellwands.hooks.shop.EconomyShopGuiHook;
 import com.artillexstudios.axsellwands.hooks.shop.EssentialsHook;
 import com.artillexstudios.axsellwands.hooks.shop.ExcellentShopHook;
+import com.artillexstudios.axsellwands.hooks.shop.MultiPricesHook;
 import com.artillexstudios.axsellwands.hooks.shop.PricesHook;
 import com.artillexstudios.axsellwands.hooks.shop.ShopGUIPlusHook;
 import org.bukkit.Bukkit;
@@ -70,11 +70,6 @@ public class HookManager {
         if (HOOKS.getBoolean("hook-settings.WorldGuard.register", true) && Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
             PROTECTION_HOOKS.add(new WorldGuardHook());
             Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into WorldGuard!"));
-        }
-
-        if (HOOKS.getBoolean("hook-settings.Kingdoms.register", true) && Bukkit.getPluginManager().getPlugin("Kingdoms") != null) {
-            PROTECTION_HOOKS.add(new KingdomsXHook());
-            Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into Kingdoms!"));
         }
 
         if (HOOKS.getBoolean("hook-settings.BentoBox.register", true) && Bukkit.getPluginManager().getPlugin("BentoBox") != null) {
@@ -169,86 +164,134 @@ public class HookManager {
         if (currency != null)
             currency.setup();
 
+        // 新的多价格提供商系统
         final String shop = HOOKS.getString("hooks.price-plugin").toUpperCase();
-        switch (shop) {
-            case "AXGENS": {
-                if (Bukkit.getPluginManager().getPlugin("AxGens") != null) {
-                    shopPrices = new AxGensHook();
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into AxGens!"));
-                } else {
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] AxGens is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+        
+        // 检查是否启用多价格提供商模式
+        boolean multiMode = shop.equals("MULTI") || shop.equals("CUSTOMFISHING+EXCELLENTSHOP");
+        
+        if (multiMode) {
+            MultiPricesHook multiHook = new MultiPricesHook();
+            
+            // 尝试加载 CustomFishing
+            if (Bukkit.getPluginManager().getPlugin("CustomFishing") != null) {
+                try {
+                    CustomFishingHook customFishingHook = new CustomFishingHook();
+                    customFishingHook.setup();
+                    if (customFishingHook.isAvailable()) {
+                        multiHook.addHook(customFishingHook);
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into CustomFishing! (Priority: 100)"));
+                    }
+                } catch (Exception e) {
+                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF9933[AxSellwands] Failed to hook into CustomFishing: " + e.getMessage()));
                 }
-                break;
             }
-
-            case "SHOPGUIPLUS": {
-                if (Bukkit.getPluginManager().getPlugin("ShopGUIPlus") != null) {
-                    shopPrices = new ShopGUIPlusHook();
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into ShopGUIPlus!"));
-                } else {
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] ShopGUIPlus is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+            
+            // 尝试加载 ExcellentShop
+            if (Bukkit.getPluginManager().getPlugin("ExcellentShop") != null) {
+                try {
+                    ExcellentShopHook excellentShopHook = new ExcellentShopHook();
+                    excellentShopHook.setup();
+                    if (excellentShopHook.isAvailable()) {
+                        multiHook.addHook(excellentShopHook);
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into ExcellentShop! (Priority: 50)"));
+                    }
+                } catch (Exception e) {
+                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF9933[AxSellwands] Failed to hook into ExcellentShop: " + e.getMessage()));
                 }
-                break;
             }
-
-            case "ESSENTIALS": {
-                if (Bukkit.getPluginManager().getPlugin("Essentials") != null) {
-                    shopPrices = new EssentialsHook();
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into Essentials!"));
-                } else {
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] Essentials is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+            
+            // 如果没有任何可用的提供商，使用内置价格
+            if (!multiHook.isAvailable()) {
+                Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF9933[AxSellwands] No price providers available in multi mode, using builtin prices!"));
+                multiHook.addHook(new BuiltinPrices());
+            }
+            
+            shopPrices = multiHook;
+            Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Using multi-provider mode with " + multiHook.getHooks().size() + " provider(s)!"));
+        } else {
+            // 单一价格提供商模式（保持向后兼容）
+            switch (shop) {
+                case "AXGENS": {
+                    if (Bukkit.getPluginManager().getPlugin("AxGens") != null) {
+                        shopPrices = new AxGensHook();
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into AxGens!"));
+                    } else {
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] AxGens is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+                    }
+                    break;
                 }
-                break;
-            }
 
-            case "CMI": {
-                if (Bukkit.getPluginManager().getPlugin("CMI") != null) {
-                    shopPrices = new CMIPricesHook();
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into CMI (prices)!"));
-                } else {
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] CMI is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+                case "SHOPGUIPLUS": {
+                    if (Bukkit.getPluginManager().getPlugin("ShopGUIPlus") != null) {
+                        shopPrices = new ShopGUIPlusHook();
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into ShopGUIPlus!"));
+                    } else {
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] ShopGUIPlus is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+                    }
+                    break;
                 }
-                break;
-            }
 
-            case "ECONOMYSHOPGUI": {
-                if (Bukkit.getPluginManager().getPlugin("EconomyShopGUI") != null || Bukkit.getPluginManager().getPlugin("EconomyShopGUI-Premium") != null) {
-                    shopPrices = new EconomyShopGuiHook();
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into EconomyShopGUI!"));
-                } else {
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] EconomyShopGUI is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+                case "ESSENTIALS": {
+                    if (Bukkit.getPluginManager().getPlugin("Essentials") != null) {
+                        shopPrices = new EssentialsHook();
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into Essentials!"));
+                    } else {
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] Essentials is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+                    }
+                    break;
                 }
-                break;
-            }
 
-            case "DYNAMICSHOP": {
-                if (Bukkit.getPluginManager().getPlugin("DynamicShop") != null) {
-                    shopPrices = new DynamicShop3Hook();
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into DynamicShop!"));
-                } else {
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] DynamicShop is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+                case "CMI": {
+                    if (Bukkit.getPluginManager().getPlugin("CMI") != null) {
+                        shopPrices = new CMIPricesHook();
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into CMI (prices)!"));
+                    } else {
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] CMI is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+                    }
+                    break;
                 }
-                break;
-            }
 
-            case "EXCELLENTSHOP": {
-                if (Bukkit.getPluginManager().getPlugin("ExcellentShop") != null) {
-                    shopPrices = new ExcellentShopHook();
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into ExcellentShop!"));
-                } else {
-                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] ExcellentShop is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+                case "ECONOMYSHOPGUI": {
+                    if (Bukkit.getPluginManager().getPlugin("EconomyShopGUI") != null || Bukkit.getPluginManager().getPlugin("EconomyShopGUI-Premium") != null) {
+                        shopPrices = new EconomyShopGuiHook();
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into EconomyShopGUI!"));
+                    } else {
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] EconomyShopGUI is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+                    }
+                    break;
                 }
-                break;
-            }
 
-            default: {
-                shopPrices = new BuiltinPrices();
-                Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Using builtin prices!"));
-                break;
+                case "EXCELLENTSHOP": {
+                    if (Bukkit.getPluginManager().getPlugin("ExcellentShop") != null) {
+                        shopPrices = new ExcellentShopHook();
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into ExcellentShop!"));
+                    } else {
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] ExcellentShop is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+                    }
+                    break;
+                }
+                
+                case "CUSTOMFISHING": {
+                    if (Bukkit.getPluginManager().getPlugin("CustomFishing") != null) {
+                        shopPrices = new CustomFishingHook();
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Hooked into CustomFishing!"));
+                    } else {
+                        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] CustomFishing is set in hooks.yml, but it is not installed, please download it or change it to stop errors!"));
+                    }
+                    break;
+                }
+
+                default: {
+                    shopPrices = new BuiltinPrices();
+                    Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxSellwands] Using builtin prices!"));
+                    break;
+                }
             }
+            if (shopPrices != null)
+                shopPrices.setup();
         }
-        if (shopPrices != null)
-            shopPrices.setup();
+        
         if (getShopPrices() == null) {
             Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF3333[AxSellwands] Shop prices hook not found! Please check your hooks.yml!"));
         }

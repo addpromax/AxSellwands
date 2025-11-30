@@ -4,7 +4,7 @@ import com.Zrips.CMI.Modules.Worth.WorthItem;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class CMIPricesHook implements PricesHook {
+public class CMIPricesHook implements AdvancedPricesHook {
     private com.Zrips.CMI.CMI manager;
 
     @Override

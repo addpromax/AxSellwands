@@ -4,7 +4,7 @@ import com.artillexstudios.axgens.api.AxGensAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class AxGensHook implements PricesHook {
+public class AxGensHook implements AdvancedPricesHook {
 
     @Override
     public void setup() {

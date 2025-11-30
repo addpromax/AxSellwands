@@ -4,7 +4,7 @@ import net.brcdev.shopgui.ShopGuiPlusApi;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class ShopGUIPlusHook implements PricesHook {
+public class ShopGUIPlusHook implements AdvancedPricesHook {
 
     @Override
     public void setup() {
