@@ -1,0 +1,36 @@
+# DOCUMENTATION: https://docs.artillex-studios.com/axsellwands.html
+# ITEM BUILDER: https://docs.artillex-studios.com/item-builder.html
+
+name: "&#FF5500Advanced Charger"
+
+item:
+  material: DIAMOND
+  glow: true
+  name: "&#FF5500&lADVANCED CHARGER"
+  lore:
+    - ""
+    - "&#FF5500高级充电器"
+    - " &8❙ &f每次充电: &#FF550050 次使用"
+    - " &8❙ &f剩余电量: &#FF5500%power%/%total-power%"
+    - ""
+    - "&#FF5500使用方法:"
+    - " &8❙ &f主手持充电器"
+    - " &8❙ &f副手持魔杖"
+    - " &8❙ &f右键使用"
+    - ""
+
+# how many uses to add per charge
+# 每次充电增加的使用次数
+uses-per-charge: 50
+
+# total power this charger can hold
+# 充电器总电量（充多少消耗多少）
+total-power: 500
+
+# sellwand type limits (leave empty to allow all)
+# 魔杖类型限制（留空表示允许所有）
+sellwand-limits: {}
+
+# multiplier limits (leave empty to allow all)
+# 倍率限制（留空表示允许所有）
+multiplier-limits: {}

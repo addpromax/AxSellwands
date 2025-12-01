@@ -1,8 +1,37 @@
 # AxSellwands - CustomFishing & ExcellentShop Fork
 
-> 本 Fork 版本添加了对 CustomFishing 和 ExcellentShop 的完整支持
+> 本 Fork 版本添加了对 CustomFishing 和 ExcellentShop 的完整支持，以及出售二次确认功能
 
 ## 🎯 Fork 新增特性
+
+### 魔杖充电器/放电器系统 ⚡
+- ✅ **充电器物品**: 为耗尽的魔杖恢复使用次数
+- ✅ **放电器物品**: 从魔杖中提取使用次数并转换为充电器
+- ✅ **可选模式**: 魔杖耗尽时可选择需要充电或直接销毁
+- ✅ **基于倍率和类型的限制**: 根据魔杖倍率和类型设置充电限制
+- ✅ **完全可配置**: 充电数量、限制条件、转换规则等
+
+### 魔杖绑定系统 🔒
+- ✅ **玩家绑定**: 魔杖可以绑定到特定玩家
+- ✅ **自动绑定**: 给予时自动绑定到接收玩家
+- ✅ **绑定检查**: 只有绑定的玩家才能使用魔杖
+- ✅ **管理员绕过**: 拥有 `axsellwands.admin` 权限可绕过绑定限制
+- ✅ **完全可配置**: 每个魔杖可独立配置是否支持绑定
+
+### 魔杖权限控制系统
+- ✅ 为每个魔杖添加独立的使用权限
+- ✅ 可配置是否需要权限才能使用
+- ✅ 自定义权限节点
+- ✅ 管理员权限 `axsellwands.admin` 可绕过所有权限检查
+- ✅ 完全可配置的权限提示消息
+
+### 出售二次确认系统
+- ✅ 可配置的二次确认功能，防止误操作
+- ✅ 第一次点击显示价格信息和物品清单
+- ✅ 第二次点击才真正执行出售
+- ✅ 可配置确认超时时间
+- ✅ 自动检测容器内容变化
+- ✅ 完全可配置的消息和音效
 
 ### 多价格提供商系统
 - ✅ 同时支持 CustomFishing 和 ExcellentShop 作为价格提供商
@@ -17,6 +46,159 @@
 
 ### 配置方法
 
+#### 充电器/放电器配置
+
+**在 `config.yml` 中配置充电模式**：
+
+```yaml
+charger:
+  # 魔杖耗尽时需要充电而不是销毁
+  require-recharge: false
+
+discharger:
+  # 每次提取的使用次数
+  uses-per-extract: 10
+  # 提取后给予的充电器类型
+  charger-to-give: "basic-charger"
+```
+
+**创建充电器配置文件** (`chargers/basic-charger.yml`):
+
+```yaml
+name: "&#33FF33Basic Charger"
+
+item:
+  material: EMERALD
+  glow: true
+  name: "&#33FF33&lBASIC CHARGER"
+  lore:
+    - "&#33FF33充电器"
+    - " &8❙ &f每次充电: &#33FF3310 次使用"
+    - " &8❙ &f剩余次数: &#33FF33%charges%/%max-charges%"
+
+# 每次充电增加的使用次数
+uses-per-charge: 10
+
+# 充电器最大充电次数（耐久度）
+max-charges: 100
+
+# 魔杖类型限制（留空表示允许所有）
+sellwand-limits: {}
+
+# 倍率限制（留空表示允许所有）
+multiplier-limits: {}
+```
+
+**充电器耐久系统**：
+- 每个充电器有 `max-charges` 次充电机会
+- 每次使用消耗1次充电机会
+- 充电次数用尽后充电器消失
+- 使用 `%charges%` 和 `%max-charges%` 变量显示剩余次数
+
+**使用方法**：
+
+1. **充电器使用**:
+   - 主手持充电器
+   - 副手持魔杖
+   - 右键使用
+
+2. **放电器使用**:
+   - 主手持放电器
+   - 副手持魔杖
+   - 右键使用（提取使用次数并获得充电器）
+
+3. **设置限制**:
+```yaml
+# 只允许为特定魔杖充电
+sellwand-limits:
+  normal-sellwand: 100
+  unlimited-sellwand: -1
+
+# 只允许为特定倍率充电
+multiplier-limits:
+  1.0: 100
+  1.5: 150
+```
+
+#### 魔杖绑定配置
+
+在每个魔杖的配置文件中（例如 `sellwands/normal-sellwand.yml`）：
+
+```yaml
+# bind settings
+# 绑定设置
+# if true, this sellwand can be bound to a player
+# 如果为true，此魔杖可以绑定到玩家
+bindable: false
+# if true, automatically bind to player when given
+# 如果为true，给予时自动绑定到玩家
+bind-on-give: false
+```
+
+**使用示例**：
+
+1. **启用绑定功能**：
+```yaml
+bindable: true
+bind-on-give: true
+```
+
+2. **效果**：
+   - 使用 `/axsellwands give` 命令给予魔杖时，自动绑定到接收玩家
+   - 只有绑定的玩家可以使用该魔杖
+   - 其他玩家无法使用（会提示"此魔杖已绑定到其他玩家"）
+   - 管理员（`axsellwands.admin`）可以绕过绑定限制
+
+3. **应用场景**：
+   - VIP专属魔杖（防止转让）
+   - 个人绑定魔杖（防止被盗）
+   - 限制魔杖流通
+
+4. **显示绑定者**：
+
+在魔杖lore中使用 `%bound-player%` 变量显示绑定者：
+
+```yaml
+item:
+  lore:
+    - " &8❙ &fBound to: &#FF5500%bound-player%"
+```
+
+- 如果魔杖已绑定，显示玩家名称
+- 如果魔杖未绑定，显示"未绑定"
+
+#### 魔杖权限控制配置
+
+在每个魔杖的配置文件中（例如 `sellwands/normal-sellwand.yml`）：
+
+```yaml
+# permission settings
+# 权限设置
+# if true, players need permission to use this sellwand
+# 如果为true，玩家需要权限才能使用此魔杖
+require-permission: false
+# the permission required to use this sellwand
+# 使用此魔杖所需的权限
+# default: axsellwands.use.<sellwand-id>
+# players with axsellwands.admin bypass this check
+# 拥有 axsellwands.admin 权限的玩家可以绕过此检查
+permission: "axsellwands.use.normal-sellwand"
+```
+
+**使用示例**：
+
+1. **启用权限控制**：将 `require-permission` 设置为 `true`
+2. **给予玩家权限**：
+   - 使用特定魔杖：`axsellwands.use.normal-sellwand`
+   - 使用所有魔杖：`axsellwands.use.*`
+   - 管理员绕过：`axsellwands.admin`
+
+**权限节点说明**：
+- `axsellwands.use.<魔杖ID>` - 使用特定魔杖的权限
+- `axsellwands.admin` - 管理员权限，绕过所有检查（包括权限和领地保护）
+
+#### 多价格提供商配置
+
 在 `hooks.yml` 中配置：
 
 ```yaml
@@ -29,6 +211,41 @@ hooks:
 ```yaml
 hooks:
   price-plugin: "CUSTOMFISHING+EXCELLENTSHOP"
+```
+
+#### 出售二次确认配置
+
+在 `config.yml` 中配置：
+
+```yaml
+sell-confirmation:
+  # 启用出售二次确认功能
+  enabled: true
+  # 确认超时时间（秒）
+  timeout-seconds: 30
+  # 确认消息中显示的最大物品数量
+  max-items-display: 10
+```
+
+在 `lang.yml` 中自定义消息：
+
+```yaml
+sell-confirmation:
+  request: 
+    - "&#FFAA00━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    - "&#FFCC00<b>出售确认</b>"
+    - " "
+    - "&#FFAA55将要出售 &f%amount% &#FFAA55件物品"
+    - "&#FFAA55总价值: &f%price%$"
+    - " "
+    - "&#FFAA55物品清单:"
+    - "&#DDDDDD%items%"
+    - " "
+    - "&#33FF33再次右键点击容器确认出售"
+    - "&#FF3333确认将在 &f%timeout% &#FF3333秒后超时"
+    - "&#FFAA00━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  timeout: "&#FF3333出售确认已超时，请重新操作！"
+  changed: "&#FF3333容器内容已改变，请重新确认！"
 ```
 
 ### 工作原理
@@ -45,11 +262,13 @@ hooks:
 - `SellResult` - 出售结果类
 - `CustomFishingHook` - CustomFishing 集成
 - `MultiPricesHook` - 多价格提供商管理器
+- `SellConfirmationManager` - 出售确认管理器
 
 **修改类**:
 - `ExcellentShopHook` - 增加限制检查
 - `HookManager` - 支持多价格提供商
-- `SellwandUseListener` - 使用新的价格系统
+- `SellwandUseListener` - 使用新的价格系统和二次确认功能
+- `AxSellwands` - 初始化确认管理器
 
 ### 依赖要求
 

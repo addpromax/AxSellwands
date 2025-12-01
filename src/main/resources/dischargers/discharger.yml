@@ -1,0 +1,55 @@
+# DOCUMENTATION: https://docs.artillex-studios.com/axsellwands.html
+# ITEM BUILDER: https://docs.artillex-studios.com/item-builder.html
+
+name: "&#FF3333Discharger"
+
+item:
+  material: REDSTONE
+  glow: true
+  name: "&#FF3333&lDISCHARGER"
+  lore:
+    - ""
+    - "&#FF3333放电器"
+    - " &8❙ &f提取: &#FF333310 次使用"
+    - " &8❙ &f税率: &#FF333310%"
+    - " &8❙ &f实际消耗: &#FF333311 次"
+    - " &8❙ &f转换为: &#33FF33基础充电器"
+    - " &8❙ &f剩余次数: &#FF3333%uses%/%max-uses%"
+    - ""
+    - "&#FF3333使用方法:"
+    - " &8❙ &f主手持放电器"
+    - " &8❙ &f副手持魔杖"
+    - " &8❙ &f右键使用"
+    - ""
+
+# how many uses to extract
+# 提取的使用次数
+extract-amount: 10
+
+# discharger durability (how many times can be used)
+# 放电器耐久度（可以使用多少次）
+discharger-uses: 10
+
+# extract tax rate (0.1 = 10%)
+# 提取税率（0.1 = 10%）
+# 实际消耗 = extract-amount * (1 + extract-tax)
+extract-tax: 0.1
+
+# which charger to give when extracting uses
+# 提取后给予的充电器类型
+charger-to-give: "basic-charger"
+
+# allow extracting from unlimited wands
+# 是否允许从无限魔杖提取
+allow-unlimited: false
+
+# sellwand type limits (leave empty to allow all)
+# 魔杖类型限制（留空表示允许所有）
+sellwand-limits: {}
+#  normal-sellwand: 100
+
+# multiplier limits (leave empty to allow all)
+# 倍率限制（留空表示允许所有）
+multiplier-limits: {}
+#  1.0: 100
+#  1.5: 150

@@ -41,3 +41,13 @@ allowed-containers:
 # values: CHEST, TRAPPED_CHEST, ENDER_CHEST, all SHULKER_BOX-es, FURNACE, BLAST_FURNACE, BARREL, HOPPER, SMOKER, DISPENSER, DROPPER
 # containers where you can't use sell wands, don't use both allowed-containers and disallowed-containers at once
 disallowed-containers: []
+
+# permission settings
+# 权限设置
+require-permission: false
+permission: "axsellwands.use.container-sellwand"
+
+# bind settings
+# 绑定设置
+bindable: false
+bind-on-give: false

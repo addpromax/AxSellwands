@@ -32,6 +32,13 @@ public enum Give {
         replacements.put("%max-uses%", "" + (uses == -1 ? LANG.getString("unlimited", "∞") : uses));
         replacements.put("%sold-amount%", "" + 0);
         replacements.put("%sold-price%", "" + 0);
+        
+        // 添加绑定者变量
+        if (sellwand.isBindable() && sellwand.isBindOnGive()) {
+            replacements.put("%bound-player%", player.getName());
+        } else {
+            replacements.put("%bound-player%", LANG.getString("not-bound", "未绑定"));
+        }
 
         ItemBuilder builder = ItemBuilder.create(sellwand.getItemSection(), replacements);
         ItemStack it = builder.get();
@@ -44,6 +51,11 @@ public enum Give {
         wrapper.set("axsellwands-max-uses", uses);
         wrapper.set("axsellwands-sold-amount", 0);
         wrapper.set("axsellwands-sold-price", 0D);
+        
+        // 如果魔杖配置为给予时绑定，则绑定到玩家
+        if (sellwand.isBindable() && sellwand.isBindOnGive()) {
+            wrapper.set("axsellwands-bound-player", player.getName());
+        }
 
         int am = 1;
         if (amount != null) am = amount;

@@ -19,6 +19,10 @@ public class Sellwand {
     private final Section itemSection;
     private final HashSet<Material> disallowed = new HashSet<>();
     private final HashSet<Material> allowed = new HashSet<>();
+    private final String permission;
+    private final boolean requirePermission;
+    private final boolean bindable;
+    private final boolean bindOnGive;
 
     public Sellwand(String id, @NotNull Config file) {
         this.id = id;
@@ -36,6 +40,10 @@ public class Sellwand {
         this.uses = file.getInt("uses", -1);
         this.cooldown = file.getLong("cooldown-milliseconds", 0);
         this.itemSection = file.getSection("item");
+        this.requirePermission = file.getBoolean("require-permission", false);
+        this.permission = file.getString("permission", "axsellwands.use." + id);
+        this.bindable = file.getBoolean("bindable", false);
+        this.bindOnGive = file.getBoolean("bind-on-give", false);
 
         for (String str : file.getStringList("disallowed-containers")) {
             final Material material = Material.getMaterial(str);
@@ -90,5 +98,21 @@ public class Sellwand {
 
     public HashSet<Material> getAllowed() {
         return allowed;
+    }
+
+    public boolean isRequirePermission() {
+        return requirePermission;
+    }
+
+    public String getPermission() {
+        return permission;
+    }
+
+    public boolean isBindable() {
+        return bindable;
+    }
+
+    public boolean isBindOnGive() {
+        return bindOnGive;
     }
 }

@@ -42,6 +42,31 @@ hologram:
 # 0 used to be the default in vanilla minecraft until 1.13
 minimum-durability: 1
 
+# sell confirmation settings
+# 出售二次确认设置
+sell-confirmation:
+  # enable double confirmation for selling
+  # 启用出售二次确认功能
+  enabled: false
+  # timeout in seconds for confirmation
+  # 确认超时时间（秒）
+  timeout-seconds: 30
+
+# charger/discharger settings
+# 充电器/放电器设置
+charger:
+  # if true, sellwands require recharge when depleted instead of breaking
+  # 如果为true，魔杖耗尽时需要充电而不是销毁
+  require-recharge: false
+
+discharger:
+  # how many uses to extract per discharger use
+  # 每次使用放电器提取的使用次数
+  uses-per-extract: 10
+  # which charger to give when extracting uses
+  # 提取使用次数时给予的充电器类型
+  charger-to-give: "basic-charger"
+
 # should be plugin notify you if there is a new update?
 update-notifier:
   # if enabled, it will display the message in the console
@@ -49,5 +74,9 @@ update-notifier:
   # if enabled, it will broadcast the update message to all players who have the <plugin-name>.update-notify permission
   on-join: true
 
+# debug mode - prints detailed logs to console
+# 调试模式 - 在后台打印详细日志
+debug: false
+
 # do not change this
-version: 5
+version: 6

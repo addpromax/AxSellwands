@@ -5,9 +5,12 @@ help:
   - "<gradient:#FF5500:#FF7700><b>AxSellwands</b></gradient> <#FFAA00>Help"
   - " <#FFAA00>➤ <white>/axsellwands reload <#DDDDDD>| <#FFCC00>Reload plugin"
   - " <#FFAA00>➤ <white>/axsellwands give <player> <sellwand> [amount] <#DDDDDD>| <#FFCC00>Give sellwands"
+  - " <#FFAA00>➤ <white>/axsellwands givecharger <player> <charger> [amount] <#DDDDDD>| <#FFCC00>Give chargers"
+  - " <#FFAA00>➤ <white>/axsellwands givedischarger <player> <charger> [amount] <#DDDDDD>| <#FFCC00>Give dischargers"
   - " "
 
 unlimited: "∞"
+not-bound: "未绑定"
 
 reload:
   success: "&#33FF33Plugin successfully reloaded!"
@@ -16,19 +19,57 @@ reload:
 sellwand-give: "&#FFAA55You have given &f%amount%x %sellwand% &#FFAA55to &f%player%&#FFAA55!"
 sellwand-got: "&#FFAA55You have received &f%amount%x %sellwand%&#FFAA55!"
 
+charger-give: "&#33FF33你已给予 &f%player% &#33FF33&f%amount%x %charger%&#33FF33！"
+charger-got: "&#33FF33你获得了 &f%amount%x %charger%&#33FF33！"
+
 nothing-sold: "&#FFAA55Nothing in the container is sellable!"
 
 cooldown: "&#FFAA55You must wait another &f%time% seconds &#FFAA55before using this sellwand again!"
 
 no-permission: "&#FFAA55You don't have a permission to use a sellwand on this container!"
 
+no-sellwand-permission: "&#FF3333你没有使用此魔杖的权限！"
+
 disallowed-container: "&#FFAA55This sellwand can't be used on this type of container!"
+
+# charger messages
+# 充电器消息
+charger:
+  no-sellwand: "&#FF3333请在副手持有魔杖！"
+  cannot-charge: "&#FF3333此充电器无法为该魔杖充电！"
+  already-full: "&#FF3333魔杖使用次数已满，无需充电！"
+  not-bound-to-you: "&#FF3333此魔杖已绑定到其他玩家，你无法为其充电！"
+  success: "&#33FF33成功充电 &f%uses% &#33FF33次使用！魔杖: &f%total% &#33FF33| 充电器剩余: &f%power%"
+  depleted: "&#FFAA55充电器电量已耗尽，已自动销毁！"
+  config-error: "&#FF3333充电器配置错误，请联系管理员！"
+  sellwand-config-error: "&#FF3333魔杖配置错误，请联系管理员！"
+
+# discharger messages
+# 放电器消息
+discharger:
+  no-sellwand: "&#FF3333请在副手持有魔杖！"
+  unlimited-wand: "&#FF3333无限使用的魔杖无法提取使用次数！"
+  not-enough-uses: "&#FF3333魔杖使用次数不足！需要 &f%cost% &#FF3333次！"
+  cannot-extract: "&#FF3333此放电器无法从该魔杖提取使用次数！"
+  not-bound-to-you: "&#FF3333此魔杖已绑定到其他玩家，你无法从其提取使用次数！"
+  success: "&#33FF33成功提取 &f%extract% &#33FF33次使用（消耗 &f%cost% &#33FF33次，税率 &f%tax%%&#33FF33）并转换为充电器！放电器剩余: &f%remaining%"
+  depleted: "&#FFAA55放电器使用次数已耗尽，已自动销毁！"
+  config-error: "&#FF3333放电器配置错误，请联系管理员！"
+  sellwand-config-error: "&#FF3333魔杖配置错误，请联系管理员！"
+  charger-config-error: "&#FF3333充电器配置错误 (&f%charger%&#FF3333)，请联系管理员！"
+
+# sellwand messages
+# 魔杖消息
+sellwand:
+  requires-recharge: "&#FF3333魔杖使用次数已耗尽，需要充电！"
+  not-bound-to-you: "&#FF3333此魔杖已绑定到其他玩家，你无法使用！"
 
 # list of sounds: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
 # set to "" to mute
 sounds:
   sell: "ENTITY_VILLAGER_YES"
   inspect: ""
+  confirm-request: "BLOCK_NOTE_BLOCK_PLING"
 
 # list of particles: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
 # set to "" to disable
@@ -64,6 +105,28 @@ sell-hologram:
   - "&#FFAA55Sold &f%amount% &#FFAA55items"
   - "&#DDDDDD+%price%$"
 
+# sell confirmation messages
+# 出售确认消息
+sell-confirmation:
+  # first click - request confirmation
+  # 第一次点击 - 请求确认
+  request: 
+    - "&#FFAA00━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    - "&#FFCC00<b>出售确认</b>"
+    - " "
+    - "&#FFAA55将要出售 &f%amount% &#FFAA55件物品"
+    - "&#FFAA55总价值: &f%price%$"
+    - " "
+    - "&#33FF33再次右键点击容器确认出售"
+    - "&#FF3333确认将在 &f%timeout% &#FF3333秒后超时"
+    - "&#FFAA00━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  # confirmation timeout
+  # 确认超时
+  timeout: "&#FF3333出售确认已超时，请重新操作！"
+  # container contents changed
+  # 容器内容已改变
+  changed: "&#FF3333容器内容已改变，请重新确认！"
+
 commands:
   invalid-value: "&#FF0000Invalid parameter: &#BB0000%value%"
   invalid-command: "&#FF0000Invalid command or subcommand!"
@@ -77,4 +140,4 @@ commands:
 update-notifier: "&#FFAA00There is a new version of AxSellwands available! &#DDDDDD(&#FFFFFFcurrent: &#FF0000%current% &#DDDDDD| &#FFFFFFlatest: &#00FF00%latest%&#DDDDDD)"
 
 # do not change this
-version: 4
+version: 8

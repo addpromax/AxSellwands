@@ -1,6 +1,10 @@
 package com.artillexstudios.axsellwands.commands;
 
 import com.artillexstudios.axsellwands.AxSellwands;
+import com.artillexstudios.axsellwands.chargers.Charger;
+import com.artillexstudios.axsellwands.chargers.Chargers;
+import com.artillexstudios.axsellwands.chargers.DischargerType;
+import com.artillexstudios.axsellwands.chargers.Dischargers;
 import com.artillexstudios.axsellwands.sellwands.Sellwand;
 import com.artillexstudios.axsellwands.sellwands.Sellwands;
 import com.artillexstudios.axsellwands.utils.CommandMessages;
@@ -31,6 +35,38 @@ public class CommandManager {
         handler.registerValueResolver(Sellwand.class, resolver -> {
             final String str = resolver.popForParameter();
             if (Sellwands.getSellwands().containsKey(str)) return Sellwands.getSellwands().get(str);
+            throw new CommandErrorException("invalid-command", str);
+        });
+
+        // 注册Charger参数解析器
+        handler.getAutoCompleter().registerParameterSuggestions(Charger.class, (args, sender, command) -> {
+            List<String> suggestions = new ArrayList<>();
+            Chargers.getChargers().forEach((id, charger) -> suggestions.add(id));
+            if (!suggestions.isEmpty()) return suggestions;
+            sender.error("There are no chargers configured!");
+            return suggestions;
+        });
+
+        handler.registerValueResolver(Charger.class, resolver -> {
+            final String str = resolver.popForParameter();
+            if (Chargers.getChargers().containsKey(str)) return Chargers.getChargers().get(str);
+            throw new CommandErrorException("invalid-command", str);
+        });
+
+        // 注册DischargerType参数解析器
+        handler.getAutoCompleter().registerParameterSuggestions(DischargerType.class, (args, sender, command) -> {
+            List<String> suggestions = new ArrayList<>();
+            Dischargers.getDischargers().forEach((id, discharger) -> suggestions.add(id));
+            if (!suggestions.isEmpty()) return suggestions;
+            sender.error("There are no dischargers configured!");
+            return suggestions;
+        });
+
+        handler.registerValueResolver(DischargerType.class, resolver -> {
+            final String str = resolver.popForParameter();
+            if (Dischargers.getDischargers().containsKey(str)) {
+                return new DischargerType(Dischargers.getDischargers().get(str));
+            }
             throw new CommandErrorException("invalid-command", str);
         });
 

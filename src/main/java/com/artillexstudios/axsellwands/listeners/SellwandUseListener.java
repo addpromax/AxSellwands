@@ -16,6 +16,7 @@ import com.artillexstudios.axsellwands.sellwands.Sellwands;
 import com.artillexstudios.axsellwands.utils.HistoryUtils;
 import com.artillexstudios.axsellwands.utils.HologramUtils;
 import com.artillexstudios.axsellwands.utils.NumberUtils;
+import com.artillexstudios.axsellwands.utils.SellConfirmationManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -67,6 +68,21 @@ public class SellwandUseListener implements Listener {
         }
 
         boolean hasBypass = player.hasPermission("axsellwands.admin");
+
+        // 检查魔杖绑定
+        if (sellwand.isBindable() && !hasBypass) {
+            String boundPlayer = wrapper.getString("axsellwands-bound-player");
+            if (boundPlayer != null && !boundPlayer.isEmpty() && !boundPlayer.equals(player.getName())) {
+                MESSAGEUTILS.sendLang(player, "sellwand.not-bound-to-you");
+                return;
+            }
+        }
+
+        // 检查魔杖使用权限
+        if (sellwand.isRequirePermission() && !hasBypass && !player.hasPermission(sellwand.getPermission())) {
+            MESSAGEUTILS.sendLang(player, "no-sellwand-permission");
+            return;
+        }
 
         if (!hasBypass && !HookManager.canBuildAt(player, block.getLocation())) {
             MESSAGEUTILS.sendLang(player, "no-permission");
@@ -126,6 +142,56 @@ public class SellwandUseListener implements Listener {
                 else
                     items.put(it.getType(), it.getAmount());
             }
+
+            if (newSoldAmount <= 0 || newSoldPrice <= 0) {
+                MESSAGEUTILS.sendLang(player, "nothing-sold");
+                return;
+            }
+            
+            // 二次确认功能
+            boolean requireConfirmation = CONFIG.getBoolean("sell-confirmation.enabled", false);
+            
+            if (requireConfirmation) {
+                // 检查是否有待确认的操作
+                if (SellConfirmationManager.hasPendingConfirmation(player)) {
+                    // 第二次点击，执行出售
+                    SellConfirmationManager.ConfirmationData confirmData = SellConfirmationManager.confirmAndGet(player);
+                    
+                    if (confirmData == null) {
+                        // 确认已超时
+                        MESSAGEUTILS.sendLang(player, "sell-confirmation.timeout");
+                        return;
+                    }
+                    
+                    // 验证价格和数量是否一致（防止容器内容被修改）
+                    if (Math.abs(confirmData.getTotalPrice() - newSoldPrice) > 0.01 || confirmData.getTotalAmount() != newSoldAmount) {
+                        MESSAGEUTILS.sendLang(player, "sell-confirmation.changed");
+                        return;
+                    }
+                    
+                    // 继续执行出售逻辑
+                } else {
+                    // 第一次点击，创建确认请求
+                    SellConfirmationManager.createConfirmation(player, newSoldPrice, newSoldAmount, items);
+                    
+                    // 发送确认消息
+                    HashMap<String, String> confirmReplacements = new HashMap<>();
+                    confirmReplacements.put("%amount%", "" + newSoldAmount);
+                    confirmReplacements.put("%price%", NumberUtils.formatNumber(newSoldPrice));
+                    confirmReplacements.put("%timeout%", "" + (SellConfirmationManager.getConfirmationTimeout() / 1000));
+                    
+                    // 发送多行确认消息
+                    for (String line : LANG.getStringList("sell-confirmation.request")) {
+                        player.sendMessage(StringUtils.formatToString(line, confirmReplacements));
+                    }
+                    
+                    if (!LANG.getString("sounds.confirm-request", "").isEmpty()) {
+                        player.playSound(player.getLocation(), Sound.valueOf(LANG.getString("sounds.confirm-request")), 1f, 1f);
+                    }
+                    
+                    return;
+                }
+            }
             
             // 第二遍：确认出售并清空物品
             for (Map.Entry<ItemStack, Double> entry : itemPrices.entrySet()) {
@@ -138,11 +204,6 @@ public class SellwandUseListener implements Listener {
                 }
                 
                 it.setAmount(0);
-            }
-
-            if (newSoldAmount <= 0 || newSoldPrice <= 0) {
-                MESSAGEUTILS.sendLang(player, "nothing-sold");
-                return;
             }
 
             AxSellwandsSellEvent apiEvent = new AxSellwandsSellEvent(player, newSoldPrice, newSoldAmount);
@@ -196,8 +257,16 @@ public class SellwandUseListener implements Listener {
                 uses--;
 
                 if (uses < CONFIG.getInt("minimum-durability", 1)) {
-                    event.getItem().setAmount(0);
-                    return;
+                    // 检查是否需要充电而不是销毁
+                    if (CONFIG.getBoolean("charger.require-recharge", false)) {
+                        // 设置为0使用次数，需要充电
+                        uses = 0;
+                        MESSAGEUTILS.sendLang(player, "sellwand.requires-recharge");
+                    } else {
+                        // 销毁魔杖
+                        event.getItem().setAmount(0);
+                        return;
+                    }
                 }
             }
 
@@ -207,6 +276,14 @@ public class SellwandUseListener implements Listener {
             replacements.put("%max-uses%", "" + (maxUses == -1 ? LANG.getString("unlimited", "∞") : maxUses));
             replacements.put("%sold-amount%", "" + (soldAmount + newSoldAmount));
             replacements.put("%sold-price%", NumberUtils.formatNumber(soldPrice + newSoldPrice));
+            
+            // 添加绑定者变量
+            String boundPlayer = wrapper.getString("axsellwands-bound-player");
+            if (boundPlayer != null && !boundPlayer.isEmpty()) {
+                replacements.put("%bound-player%", boundPlayer);
+            } else {
+                replacements.put("%bound-player%", LANG.getString("not-bound", "未绑定"));
+            }
 
             Sellwand wand = Sellwands.getSellwands().get(type);
             ItemBuilder builder = ItemBuilder.create(wand.getItemSection(), replacements);

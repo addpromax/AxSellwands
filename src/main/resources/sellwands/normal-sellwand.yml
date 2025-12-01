@@ -12,6 +12,7 @@ item:
     - "&#FF5500ɪɴғᴏ"
     - " &8❙ &fMultiplier: &#FF5500%multiplier%x"
     - " &8❙ &fUses: &#FF5500%uses%/%max-uses%"
+    - " &8❙ &fBound to: &#FF5500%bound-player%"
     - ""
     - "&#FF5500sᴛᴀᴛs"
     - " &8❙ &fSold items: &#FF5500%sold-amount%"
@@ -29,3 +30,24 @@ uses: 100
 # how often should the player be able to sell
 # set to 0 to disable
 cooldown-milliseconds: 0
+
+# permission settings
+# 权限设置
+# if true, players need permission to use this sellwand
+# 如果为true，玩家需要权限才能使用此魔杖
+require-permission: false
+# the permission required to use this sellwand
+# 使用此魔杖所需的权限
+# default: axsellwands.use.<sellwand-id>
+# players with axsellwands.admin bypass this check
+# 拥有 axsellwands.admin 权限的玩家可以绕过此检查
+permission: "axsellwands.use.normal-sellwand"
+
+# bind settings
+# 绑定设置
+# if true, this sellwand can be bound to a player
+# 如果为true，此魔杖可以绑定到玩家
+bindable: false
+# if true, automatically bind to player when given
+# 如果为true，给予时自动绑定到玩家
+bind-on-give: false

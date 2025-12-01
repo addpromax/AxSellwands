@@ -12,14 +12,18 @@ import com.artillexstudios.axapi.metrics.AxMetrics;
 import com.artillexstudios.axapi.utils.MessageUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.featureflags.FeatureFlags;
+import com.artillexstudios.axsellwands.chargers.Chargers;
+import com.artillexstudios.axsellwands.chargers.Dischargers;
 import com.artillexstudios.axsellwands.commands.CommandManager;
 import com.artillexstudios.axsellwands.hooks.HookManager;
+import com.artillexstudios.axsellwands.listeners.ChargerUseListener;
 import com.artillexstudios.axsellwands.listeners.CraftListener;
 import com.artillexstudios.axsellwands.listeners.InventoryClickListener;
 import com.artillexstudios.axsellwands.listeners.SellwandUseListener;
 import com.artillexstudios.axsellwands.sellwands.Sellwands;
 import com.artillexstudios.axsellwands.utils.FileUtils;
 import com.artillexstudios.axsellwands.utils.NumberUtils;
+import com.artillexstudios.axsellwands.utils.SellConfirmationManager;
 import com.artillexstudios.axsellwands.utils.UpdateNotifier;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -59,13 +63,28 @@ public final class AxSellwands extends AxPlugin {
         HookManager.setupHooks();
         NumberUtils.reload();
         CommandManager.load();
+        
+        // 初始化出售确认超时时间
+        long confirmTimeout = CONFIG.getLong("sell-confirmation.timeout-seconds", 30L) * 1000;
+        SellConfirmationManager.setConfirmationTimeout(confirmTimeout);
 
         if (FileUtils.PLUGIN_DIRECTORY.resolve("sellwands/").toFile().mkdirs()) {
             FileUtils.copyFromResource("sellwands");
         }
 
+        if (FileUtils.PLUGIN_DIRECTORY.resolve("chargers/").toFile().mkdirs()) {
+            FileUtils.copyFromResource("chargers");
+        }
+
+        if (FileUtils.PLUGIN_DIRECTORY.resolve("dischargers/").toFile().mkdirs()) {
+            FileUtils.copyFromResource("dischargers");
+        }
+
         Sellwands.reload();
+        Chargers.reload();
+        Dischargers.reload();
         getServer().getPluginManager().registerEvents(new SellwandUseListener(), this);
+        getServer().getPluginManager().registerEvents(new ChargerUseListener(), this);
         getServer().getPluginManager().registerEvents(new CraftListener(), this);
         getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
 

@@ -1,0 +1,44 @@
+# DOCUMENTATION: https://docs.artillex-studios.com/axsellwands.html
+# ITEM BUILDER: https://docs.artillex-studios.com/item-builder.html
+
+name: "&#33FF33Basic Charger"
+
+item:
+  material: EMERALD
+  glow: true
+  name: "&#33FF33&lBASIC CHARGER"
+  lore:
+    - ""
+    - "&#33FF33充电器"
+    - " &8❙ &f每次充电: &#33FF3310 次使用"
+    - " &8❙ &f剩余电量: &#33FF33%power%/%total-power%"
+    - ""
+    - "&#33FF33使用方法:"
+    - " &8❙ &f主手持充电器"
+    - " &8❙ &f副手持魔杖"
+    - " &8❙ &f右键使用"
+    - ""
+
+# how many uses to add per charge
+# 每次充电增加的使用次数
+uses-per-charge: 10
+
+# total power this charger can hold
+# 充电器总电量（充多少消耗多少）
+total-power: 100
+
+# sellwand type limits (leave empty to allow all)
+# 魔杖类型限制（留空表示允许所有）
+# only these sellwand types can be charged
+# 只有这些魔杖类型可以被充电
+sellwand-limits: {}
+#  normal-sellwand: 100
+#  unlimited-sellwand: -1
+
+# multiplier limits (leave empty to allow all)
+# 倍率限制（留空表示允许所有）
+# only sellwands with these multipliers can be charged
+# 只有这些倍率的魔杖可以被充电
+multiplier-limits: {}
+#  1.0: 100
+#  1.5: 150
