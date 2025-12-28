@@ -15,7 +15,7 @@ public class NumberUtils {
             case 0 -> formatter = new DecimalFormat(CONFIG.getString("number-formatting.formatted", "#,###.##"));
             case 1 -> {
                 final String[] lang = CONFIG.getString("number-formatting.short", "en_US").split("_");
-                formatter = DecimalFormat.getCompactNumberInstance(new Locale(lang[0], lang[1]), NumberFormat.Style.SHORT);
+                formatter = DecimalFormat.getCompactNumberInstance(Locale.of(lang[0], lang[1]), NumberFormat.Style.SHORT);
             }
             case 2 -> formatter = null;
         }
