@@ -2,6 +2,7 @@ package com.artillexstudios.axsellwands.commands;
 
 import com.artillexstudios.axsellwands.chargers.Charger;
 import com.artillexstudios.axsellwands.chargers.DischargerType;
+import com.artillexstudios.axsellwands.commands.subcommands.Bind;
 import com.artillexstudios.axsellwands.commands.subcommands.Give;
 import com.artillexstudios.axsellwands.commands.subcommands.GiveCharger;
 import com.artillexstudios.axsellwands.commands.subcommands.Help;
@@ -27,8 +28,8 @@ public class Commands {
     }
 
     @Subcommand("give")
-    public void give(@NotNull CommandSender sender, Player player, @NotNull Sellwand sellwand, @Optional @Range(min = 1, max = 64) Integer amount) {
-        Give.INSTANCE.execute(sender, player, sellwand, amount);
+    public void give(@NotNull CommandSender sender, Player player, @NotNull Sellwand sellwand, @Optional @Range(min = 1, max = 64) Integer amount, @Optional Player boundPlayer) {
+        Give.INSTANCE.execute(sender, player, sellwand, amount, boundPlayer);
     }
 
     @Subcommand("givecharger")
@@ -44,5 +45,10 @@ public class Commands {
     @Subcommand("reload")
     public void reload(@NotNull CommandSender sender) {
         Reload.INSTANCE.execute(sender);
+    }
+
+    @Subcommand("bind")
+    public void bind(@NotNull Player player) {
+        Bind.INSTANCE.execute(player);
     }
 }

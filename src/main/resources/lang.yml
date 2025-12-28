@@ -2,11 +2,16 @@
 
 help:
   - " "
-  - "<gradient:#FF5500:#FF7700><b>AxSellwands</b></gradient> <#FFAA00>Help"
-  - " <#FFAA00>➤ <white>/axsellwands reload <#DDDDDD>| <#FFCC00>Reload plugin"
-  - " <#FFAA00>➤ <white>/axsellwands give <player> <sellwand> [amount] <#DDDDDD>| <#FFCC00>Give sellwands"
-  - " <#FFAA00>➤ <white>/axsellwands givecharger <player> <charger> [amount] <#DDDDDD>| <#FFCC00>Give chargers"
-  - " <#FFAA00>➤ <white>/axsellwands givedischarger <player> <charger> [amount] <#DDDDDD>| <#FFCC00>Give dischargers"
+  - "<gradient:#FF5500:#FF7700><b>AxSellwands</b></gradient> <#FFAA00>帮助"
+  - " "
+  - "<#33FF33>管理员命令:"
+  - " <#FFAA00>➤ <white>/axsellwands reload <#DDDDDD>| <#FFCC00>重载插件"
+  - " <#FFAA00>➤ <white>/axsellwands give <玩家> <魔杖> [数量] [绑定玩家] <#DDDDDD>| <#FFCC00>给予魔杖"
+  - " <#FFAA00>➤ <white>/axsellwands givecharger <玩家> <充电器> [数量] <#DDDDDD>| <#FFCC00>给予充电器"
+  - " <#FFAA00>➤ <white>/axsellwands givedischarger <玩家> <放电器> [数量] <#DDDDDD>| <#FFCC00>给予放电器"
+  - " "
+  - "<#33FF33>玩家命令:"
+  - " <#FFAA00>➤ <white>/axsellwands bind <#DDDDDD>| <#FFCC00>绑定主手魔杖到自己"
   - " "
 
 unlimited: "∞"
@@ -17,7 +22,9 @@ reload:
   failed: "&#FF3333Failed to reload the plugin! Something is wrong in the &f%file%&#FF3333 file, look in the console or use a yaml validator to fix the errors!"
 
 sellwand-give: "&#FFAA55You have given &f%amount%x %sellwand% &#FFAA55to &f%player%&#FFAA55!"
+sellwand-give-bound: "&#FFAA55You have given &f%amount%x %sellwand% &#FFAA55to &f%player% &#FFAA55(bound to &#33FF33%bound-player%&#FFAA55)!"
 sellwand-got: "&#FFAA55You have received &f%amount%x %sellwand%&#FFAA55!"
+sellwand-got-bound: "&#FFAA55You have received &f%amount%x %sellwand% &#FFAA55(bound to &#33FF33%bound-player%&#FFAA55)!"
 
 charger-give: "&#33FF33你已给予 &f%player% &#33FF33&f%amount%x %charger%&#33FF33！"
 charger-got: "&#33FF33你获得了 &f%amount%x %charger%&#33FF33！"
@@ -57,6 +64,16 @@ discharger:
   config-error: "&#FF3333放电器配置错误，请联系管理员！"
   sellwand-config-error: "&#FF3333魔杖配置错误，请联系管理员！"
   charger-config-error: "&#FF3333充电器配置错误 (&f%charger%&#FF3333)，请联系管理员！"
+
+# bind messages
+# 绑定消息
+bind:
+  no-item: "&#FF3333请在主手持有物品！"
+  not-sellwand: "&#FF3333主手物品不是魔杖！"
+  not-bindable: "&#FF3333此魔杖不支持绑定！"
+  already-bound: "&#FF3333此魔杖已绑定到 &f%bound-player%&#FF3333！"
+  config-error: "&#FF3333魔杖配置错误，请联系管理员！"
+  success: "&#33FF33成功将 &f%sellwand% &#33FF33绑定到你！"
 
 # sellwand messages
 # 魔杖消息
@@ -140,4 +157,4 @@ commands:
 update-notifier: "&#FFAA00There is a new version of AxSellwands available! &#DDDDDD(&#FFFFFFcurrent: &#FF0000%current% &#DDDDDD| &#FFFFFFlatest: &#00FF00%latest%&#DDDDDD)"
 
 # do not change this
-version: 8
+version: 11

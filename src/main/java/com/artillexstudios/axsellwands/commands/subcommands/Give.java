@@ -22,9 +22,21 @@ import static com.artillexstudios.axsellwands.AxSellwands.MESSAGEUTILS;
 public enum Give {
     INSTANCE;
 
-    public void execute(CommandSender sender, Player player, @NotNull Sellwand sellwand, @Nullable Integer amount) {
+    public void execute(CommandSender sender, Player player, @NotNull Sellwand sellwand, @Nullable Integer amount, @Nullable Player boundPlayer) {
         float multiplier = sellwand.getMultiplier();
         int uses = sellwand.getUses();
+
+        // 确定绑定玩家
+        String bindPlayerName = null;
+        if (sellwand.isBindable()) {
+            if (sellwand.isBindOnGive()) {
+                // 配置为给予时自动绑定，绑定到接收玩家
+                bindPlayerName = player.getName();
+            } else if (boundPlayer != null) {
+                // 手动指定绑定玩家
+                bindPlayerName = boundPlayer.getName();
+            }
+        }
 
         Map<String, String> replacements = new HashMap<>();
         replacements.put("%multiplier%", "" + multiplier);
@@ -34,8 +46,8 @@ public enum Give {
         replacements.put("%sold-price%", "" + 0);
         
         // 添加绑定者变量
-        if (sellwand.isBindable() && sellwand.isBindOnGive()) {
-            replacements.put("%bound-player%", player.getName());
+        if (bindPlayerName != null) {
+            replacements.put("%bound-player%", bindPlayerName);
         } else {
             replacements.put("%bound-player%", LANG.getString("not-bound", "未绑定"));
         }
@@ -52,9 +64,9 @@ public enum Give {
         wrapper.set("axsellwands-sold-amount", 0);
         wrapper.set("axsellwands-sold-price", 0D);
         
-        // 如果魔杖配置为给予时绑定，则绑定到玩家
-        if (sellwand.isBindable() && sellwand.isBindOnGive()) {
-            wrapper.set("axsellwands-bound-player", player.getName());
+        // 设置绑定玩家
+        if (bindPlayerName != null) {
+            wrapper.set("axsellwands-bound-player", bindPlayerName);
         }
 
         int am = 1;
@@ -69,8 +81,17 @@ public enum Give {
         replacements.put("%amount%", "" + am);
         replacements.put("%sellwand%", sellwand.getName());
         replacements.put("%player%", player.getName());
+        if (bindPlayerName != null) {
+            replacements.put("%bound-player%", bindPlayerName);
+        }
 
-        MESSAGEUTILS.sendLang(sender, "sellwand-give", replacements);
-        MESSAGEUTILS.sendLang(player, "sellwand-got", replacements);
+        // 根据是否绑定选择不同的消息
+        if (bindPlayerName != null) {
+            MESSAGEUTILS.sendLang(sender, "sellwand-give-bound", replacements);
+            MESSAGEUTILS.sendLang(player, "sellwand-got-bound", replacements);
+        } else {
+            MESSAGEUTILS.sendLang(sender, "sellwand-give", replacements);
+            MESSAGEUTILS.sendLang(player, "sellwand-got", replacements);
+        }
     }
 }
