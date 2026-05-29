@@ -37,6 +37,8 @@ hologram:
   billboard: vertical
   # should blocks/entities be visible behind the displays?
   see-through: false
+  # should text have an outline?
+  shadow: true
 
 # under which durability should sellwands break?
 # 0 used to be the default in vanilla minecraft until 1.13
