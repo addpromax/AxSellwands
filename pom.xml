@@ -335,8 +335,9 @@
         <dependency>
             <groupId>su.nightexpress.excellentshop</groupId>
             <artifactId>Core</artifactId>
-            <version>4.20.0</version>
-            <scope>provided</scope>
+            <version>5.1.1</version>
+            <systemPath>${project.basedir}/lib/ExcellentShop-5.1.1.jar</systemPath>
+            <scope>system</scope>
         </dependency>
         <dependency>
             <groupId>me.crafter.mc.lockettepro</groupId>
